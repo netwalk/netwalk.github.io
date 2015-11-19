@@ -24,12 +24,19 @@
   },
   "homepage": "https://github.com/sergeylukin/netwalk-reactjs#readme",
   "devDependencies": {
-    "babel-loader": "^6.2.0",
+    "babel-core": "5.x",
+    "babel-loader": "5.x",
+    "babel-plugin-react-transform": "^1.1.1",
     "css-loader": "^0.23.0",
     "html-webpack-plugin": "^1.6.2",
+    "react-transform-hmr": "^1.0.1",
     "style-loader": "^0.13.0",
     "webpack": "^1.12.6",
     "webpack-dev-server": "^1.12.1",
     "webpack-merge": "^0.3.0"
+  },
+  "dependencies": {
+    "react": "^0.14.3",
+    "react-dom": "^0.14.3"
   }
 }
