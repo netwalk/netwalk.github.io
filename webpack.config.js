@@ -12,6 +12,15 @@ module.exports = {
     path: BUILD_PATH,
     filename: 'bundle.js'
   },
+  module: {
+    loaders: [
+      {
+        test: /\.css$/,
+        loaders: ['style', 'css'],
+        include: APP_PATH
+      }
+    ]
+  },
   plugins: [
     new HtmlwebpackPlugin({
       title: 'Netwalk game'
