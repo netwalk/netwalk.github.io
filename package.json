@@ -1,0 +1,25 @@
+{
+  "name": "netwalk-reactjs",
+  "version": "0.1.0",
+  "description": "Netwalk game built using ReactJS components",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sergeylukin/netwalk-reactjs.git"
+  },
+  "keywords": [
+    "netwalk",
+    "reactjs"
+  ],
+  "author": "Sergey Lukin <contact@sergeylukin.com> (http://sergeylukin.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sergeylukin/netwalk-reactjs/issues"
+  },
+  "homepage": "https://github.com/sergeylukin/netwalk-reactjs#readme"
+}
