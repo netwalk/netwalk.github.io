@@ -6,7 +6,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --hot --inline"
   },
   "repository": {
     "type": "git",
@@ -21,5 +22,10 @@
   "bugs": {
     "url": "https://github.com/sergeylukin/netwalk-reactjs/issues"
   },
-  "homepage": "https://github.com/sergeylukin/netwalk-reactjs#readme"
+  "homepage": "https://github.com/sergeylukin/netwalk-reactjs#readme",
+  "devDependencies": {
+    "html-webpack-plugin": "^1.6.2",
+    "webpack": "^1.12.6",
+    "webpack-dev-server": "^1.12.1"
+  }
 }
