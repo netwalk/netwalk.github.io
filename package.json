@@ -36,6 +36,8 @@
     "webpack-merge": "^0.3.0"
   },
   "dependencies": {
+    "array.prototype.findindex": "^1.0.0",
+    "node-uuid": "^1.4.7",
     "react": "^0.14.3",
     "react-dom": "^0.14.3"
   }
