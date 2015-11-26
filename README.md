@@ -1,3 +1,3 @@
 # Netwalk with ReactJS
 
-More details will be provided soon
+[Live demo](http://sergeylukin.com/netwalk-reactjs)
