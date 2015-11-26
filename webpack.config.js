@@ -27,7 +27,7 @@ var common = {
         include: APP_PATH
       },
       {
-        test: /\.jsx$/,
+        test: /\.jsx?$/,
         loaders: ['babel'],
         include: APP_PATH
       }
