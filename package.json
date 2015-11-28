@@ -7,7 +7,10 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --hot --inline"
+    "stats": "webpack --profile --json > stats.json",
+    "start": "webpack-dev-server --hot --inline",
+    "build": "webpack",
+    "deploy": "node ./lib/deploy.js"
   },
   "repository": {
     "type": "git",
@@ -27,7 +30,10 @@
     "babel-core": "5.x",
     "babel-loader": "5.x",
     "babel-plugin-react-transform": "^1.1.1",
+    "clean-webpack-plugin": "^0.1.4",
     "css-loader": "^0.23.0",
+    "extract-text-webpack-plugin": "^0.9.1",
+    "gh-pages": "^0.5.0",
     "html-webpack-plugin": "^1.6.2",
     "react-transform-hmr": "^1.0.1",
     "style-loader": "^0.13.0",
