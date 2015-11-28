@@ -97,7 +97,7 @@ body {
   top: .2em;
   left: .2em;
   position: absolute;
-  border: .1em solid rgb(39.639%, 43.086%, 45.498%);
+  border: .1em solid #656E74;
   background-color: #7b858c;
 }
 
@@ -108,7 +108,7 @@ body {
   left: -.2em;
   width: .8em;
   height: .1em;
-  background-color: rgb(69.612%, 71.914%, 73.525%);
+  background-color: #B2B7BB;
 }
 
 .Node__computer--down:after,.Node__computer--left:after,.Node__computer--right:after,.Node__computer--up:after,.Node__computer:after {
