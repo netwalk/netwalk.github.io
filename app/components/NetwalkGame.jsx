@@ -10,8 +10,6 @@ export default class NetwalkGame extends Component {
     this.state = {
       matrix: []
     };
-
-    this.rotateNode = this.rotateNode.bind(this);
   }
 
   componentDidMount() {
@@ -28,7 +26,7 @@ export default class NetwalkGame extends Component {
   }
 
   render() {
-    return <NetwalkUI matrix={this.state.matrix} onRotate={this.rotateNode} />;
+    return <NetwalkUI matrix={this.state.matrix} onRotate={this.rotateNode.bind(this)} />;
   }
 
   rotateNode(id) {
