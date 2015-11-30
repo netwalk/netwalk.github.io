@@ -1,3 +1,4 @@
+import 'array.prototype.findindex';
 import uuid from 'node-uuid';
 import { vector as Vector } from 'vektor';
 

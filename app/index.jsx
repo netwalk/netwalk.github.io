@@ -1,17 +1,9 @@
 import './main.css';
 
-import 'array.prototype.findindex';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './components/App.jsx';
+import NetwalkGame from './components/NetwalkGame';
 
-main();
-
-function main()
-{
-  const app = document.createElement('div');
-
-  document.body.appendChild(app);
-
-  ReactDOM.render(<App rows="3" columns="3" />, app);
-}
+const app = document.createElement('div');
+document.body.appendChild(app);
+ReactDOM.render(<NetwalkGame />, app);
