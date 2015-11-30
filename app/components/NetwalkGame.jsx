@@ -3,11 +3,12 @@ import NetwalkUI from './NetwalkUI';
 import Netwalk from './Netwalk';
 
 export default class NetwalkGame extends Component {
+
   constructor(props) {
     super(props);
 
     this.state = {
-      board: []
+      matrix: []
     };
 
     this.rotateNode = this.rotateNode.bind(this);
@@ -17,23 +18,24 @@ export default class NetwalkGame extends Component {
 
     this.Netwalk = new Netwalk;
 
-    this.Netwalk.registerGeneratorCallback((function(board) {
+    this.Netwalk.registerGeneratorCallback((function(matrix) {
       this.setState({
-        board: board
+        matrix: matrix
       });
     }).bind(this));
 
-    this.Netwalk.generateBoard(3, 3);
+    this.Netwalk.generateMatrix(3, 3);
   }
 
   render() {
-    return <NetwalkUI board={this.state.board} onRotate={this.rotateNode} />;
+    return <NetwalkUI matrix={this.state.matrix} onRotate={this.rotateNode} />;
   }
 
   rotateNode(id) {
-    this.Netwalk.turnNode(id);
+    this.Netwalk.rotateNode(id);
     this.setState({
-      board: this.Netwalk.getCurrentBoard()
+      matrix: this.Netwalk.getCurrentMatrix()
     });
   }
+
 }

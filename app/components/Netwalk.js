@@ -3,28 +3,29 @@ import uuid from 'node-uuid';
 import { vector as Vector } from 'vektor';
 
 export default class Netwalk {
+
   constructor() {
-    this.board = [];
+    this.matrix = [];
     this.totalColumns = 0;
     this.totalRows = 0;
   }
 
-  getCurrentBoard() {
-    return this.board;
+  getCurrentMatrix() {
+    return this.matrix;
   }
 
   registerGeneratorCallback(callback) {
     this.generatorCallback = callback;
   }
 
-  generateBoard(rows, columns) {
+  generateMatrix(rows, columns) {
     const callback = this.generatorCallback;
-    let board;
+    let matrix;
 
     this.totalColumns = columns;
     this.totalRows = rows;
     
-    board = [
+    matrix = [
       {
         id: uuid.v4(),
         type: 'elbow',
@@ -98,26 +99,26 @@ export default class Netwalk {
       }
     ];
 
-    board = this.getRecalculatedBoard(board);
+    matrix = this.getRecalculatedMatrix(matrix);
 
     if (typeof callback === 'function') {
-      callback(board);
+      callback(matrix);
     }
 
-    this.board = board;
+    this.matrix = matrix;
 
-    return board;
+    return matrix;
   }
 
-  turnNode(id) {
-    let nodes = this.getCurrentBoard();
+  rotateNode(id) {
+    let matrix = this.getCurrentMatrix();
     const nodeIndex = this.findNode(id);
 
     if (nodeIndex < 0) {
       return;
     }
 
-    const node = nodes[nodeIndex];
+    const node = matrix[nodeIndex];
     const current_direction = node.direction;
     let new_direction = '';
     let new_connections = [];
@@ -188,32 +189,32 @@ export default class Netwalk {
         break;
     }
 
-    nodes[nodeIndex].direction = new_direction;
-    nodes[nodeIndex].connections = new_connections;
+    matrix[nodeIndex].direction = new_direction;
+    matrix[nodeIndex].connections = new_connections;
 
-    nodes = this.getRecalculatedBoard(nodes);
+    matrix = this.getRecalculatedMatrix(matrix);
 
-    this.setBoardTo(nodes);
+    this.setMatrixTo(matrix);
   }
 
-  getRecalculatedBoard(nodes) {
-    const server = this.getServerNode(nodes);
+  getRecalculatedMatrix(matrix) {
+    const server = this.getServerNode(matrix);
 
-    const connectedNodes = this.getConnectedNeighborsOf(server, null, nodes);
+    const connectedNodes = this.getConnectedNeighborsOf(server, null, matrix);
 
-    for (let index in nodes) {
-      let node = nodes[index];
+    for (let index in matrix) {
+      let node = matrix[index];
       if (node.type === 'server' || connectedNodes.findIndex((n) => n.id === node.id) >= 0) {
-        nodes[index].connected = true;
+        matrix[index].connected = true;
       } else {
-        nodes[index].connected = false;
+        matrix[index].connected = false;
       }
     }
 
-    return nodes;
+    return matrix;
   }
 
-  getConnectedNeighborsOf(node, exceptDirection, board) {
+  getConnectedNeighborsOf(node, exceptDirection, matrix) {
     let connectedNodes = [];
 
     if (node.type === 'computer') {
@@ -234,17 +235,13 @@ export default class Netwalk {
         continue;
       }
 
-      let neighbor = this.findNodeByVector(node.vector.add(direction.vector), board);
+      let neighbor = this.findNodeByVector(node.vector.add(direction.vector), matrix);
       if (!neighbor) {
         continue;
       }
-      if (this.nodesAreConnected(node, neighbor, board)) {
+      if (this.nodesAreConnected(node, neighbor, matrix)) {
         connectedNodes.push(neighbor);
-        // console.log("going to call getConnected on " + neighbor.type + " on " + neighbor.vector.x + "," + neighbor.vector.y + " with " + this.getOppositeDirectionOf(direction.name) + " from " + node.type + " on " + node.vector.x + "," + node.vector.y);
-      // if (node.vector.x === 0 && node.vector.y === 1) {
-      //   continue;
-      // }
-        let nodes = this.getConnectedNeighborsOf(neighbor, this.getOppositeDirectionOf(direction.name), board);
+        let nodes = this.getConnectedNeighborsOf(neighbor, this.getOppositeDirectionOf(direction.name), matrix);
         for (let key in nodes) {
           connectedNodes.push(nodes[key]);
         }
@@ -254,7 +251,7 @@ export default class Netwalk {
     return connectedNodes;
   }
 
-  nodesAreConnected(node1, node2, board) {
+  nodesAreConnected(node1, node2, matrix) {
     let xdiff = Math.abs(node1.vector.x - node2.vector.x);
     let ydiff = Math.abs(node1.vector.y - node2.vector.y);
     if (xdiff > 0 && ydiff > 0) {
@@ -328,42 +325,43 @@ export default class Netwalk {
     return x >= 0 && y >= 0 && x < this.totalColumns && y < this.totalRows;
   }
 
-  setBoardTo(board) {
-    this.board = board;
+  setMatrixTo(matrix) {
+    this.matrix = matrix;
   }
 
-  getServerNode(nodes) {
-    const nodeIndex = nodes.findIndex((node) => node.type === 'server');
+  getServerNode(matrix) {
+    const nodeIndex = matrix.findIndex((node) => node.type === 'server');
 
     if (nodeIndex < 0) {
-      console.warn('Failed to find server node', nodes);
+      console.warn('Failed to find server node', matrix);
     }
 
-    return nodes[nodeIndex];
+    return matrix[nodeIndex];
   }
 
   findNode(id) {
-    const nodes = this.getCurrentBoard();
-    const nodeIndex = nodes.findIndex((node) => node.id === id);
+    const matrix = this.getCurrentMatrix();
+    const nodeIndex = matrix.findIndex((node) => node.id === id);
 
     if (nodeIndex < 0) {
-      console.warn('Failed to find node', nodes, id);
+      console.warn('Failed to find node', matrix, id);
     }
 
     return nodeIndex;
   }
 
-  findNodeByVector(vector, nodes) {
+  findNodeByVector(vector, matrix) {
     if (!this.inBounds(vector)) {
       return null;
     }
 
     const nodeIndex = vector.x + vector.y * this.totalColumns;
 
-    if (!nodes[nodeIndex]) {
+    if (!matrix[nodeIndex]) {
       return null;
     }
 
-    return nodes[nodeIndex];
+    return matrix[nodeIndex];
   }
+
 }
