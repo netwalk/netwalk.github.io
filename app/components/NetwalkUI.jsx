@@ -1,3 +1,5 @@
+import './netwalk.css';
+
 import React, { Component } from 'react';
 import Node from './Node';
 
