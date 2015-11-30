@@ -6,8 +6,6 @@ export default class Netwalk {
 
   constructor() {
     this.matrix = [];
-    this.totalColumns = 0;
-    this.totalRows = 0;
   }
 
   getCurrentMatrix() {
@@ -21,82 +19,85 @@ export default class Netwalk {
   generateMatrix(rows, columns) {
     const callback = this.generatorCallback;
     let matrix;
-
-    this.totalColumns = columns;
-    this.totalRows = rows;
     
     matrix = [
-      {
-        id: uuid.v4(),
-        type: 'elbow',
-        direction: 'downleft',
-        connections: ['down', 'left'],
-        connected: true,
-        vector: new Vector(0, 0)
-      },
-      {
-        id: uuid.v4(),
-        type: 'tee',
-        direction: 'leftupright',
-        connections: ['left', 'up', 'right'],
-        connected: true,
-        vector: new Vector(1, 0)
-      },
-      {
-        id: uuid.v4(),
-        type: 'elbow',
-        direction: 'upright',
-        connections: ['up', 'right'],
-        connected: true,
-        vector: new Vector(2, 0)
-      },
-      {
-        id: uuid.v4(),
-        type: 'line',
-        direction: 'leftright',
-        connections: ['left', 'right'],
-        connected: true,
-        vector: new Vector(0, 1)
-      },
-      {
-        id: uuid.v4(),
-        type: 'line',
-        direction: 'updown',
-        connections: ['up', 'down'],
-        connected: true,
-        vector: new Vector(1, 1)
-      },
-      {
-        id: uuid.v4(),
-        type: 'line',
-        direction: 'leftright',
-        connections: ['left', 'right'],
-        connected: true,
-        vector: new Vector(2, 1)
-      },
-      {
-        id: uuid.v4(),
-        type: 'server',
-        direction: 'right',
-        connections: ['right'],
-        vector: new Vector(0, 2)
-      },
-      {
-        id: uuid.v4(),
-        type: 'computer',
-        direction: 'down',
-        connections: ['down'],
-        connected: true,
-        vector: new Vector(1, 2)
-      },
-      {
-        id: uuid.v4(),
-        type: 'computer',
-        direction: 'up',
-        connections: ['up'],
-        connected: true,
-        vector: new Vector(2, 2)
-      }
+      [
+        {
+          id: uuid.v4(),
+          type: 'elbow',
+          direction: 'downleft',
+          connections: ['down', 'left'],
+          connected: true,
+          vector: new Vector(0, 0)
+        },
+        {
+          id: uuid.v4(),
+          type: 'tee',
+          direction: 'leftupright',
+          connections: ['left', 'up', 'right'],
+          connected: true,
+          vector: new Vector(1, 0)
+        },
+        {
+          id: uuid.v4(),
+          type: 'elbow',
+          direction: 'upright',
+          connections: ['up', 'right'],
+          connected: true,
+          vector: new Vector(2, 0)
+        }
+      ],
+      [
+        {
+          id: uuid.v4(),
+          type: 'line',
+          direction: 'leftright',
+          connections: ['left', 'right'],
+          connected: true,
+          vector: new Vector(0, 1)
+        },
+        {
+          id: uuid.v4(),
+          type: 'line',
+          direction: 'updown',
+          connections: ['up', 'down'],
+          connected: true,
+          vector: new Vector(1, 1)
+        },
+        {
+          id: uuid.v4(),
+          type: 'line',
+          direction: 'leftright',
+          connections: ['left', 'right'],
+          connected: true,
+          vector: new Vector(2, 1)
+        }
+      ],
+      [
+        {
+          id: uuid.v4(),
+          type: 'server',
+          direction: 'right',
+          connections: ['right'],
+          vector: new Vector(0, 2)
+        },
+        {
+          id: uuid.v4(),
+          type: 'computer',
+          direction: 'down',
+          connections: ['down'],
+          connected: true,
+          vector: new Vector(1, 2)
+        },
+        {
+          id: uuid.v4(),
+          type: 'computer',
+          direction: 'up',
+          connections: ['up'],
+          connected: true,
+          vector: new Vector(2, 2)
+        }
+      ]
     ];
 
     matrix = this.getRecalculatedMatrix(matrix);
@@ -112,13 +113,12 @@ export default class Netwalk {
 
   rotateNode(id) {
     let matrix = this.getCurrentMatrix();
-    const nodeIndex = this.findNode(id);
+    const node = this.findNodeById(id);
 
-    if (nodeIndex < 0) {
+    if (!node) {
       return;
     }
 
-    const node = matrix[nodeIndex];
     const current_direction = node.direction;
     let new_direction = '';
     let new_connections = [];
@@ -189,8 +189,8 @@ export default class Netwalk {
         break;
     }
 
-    matrix[nodeIndex].direction = new_direction;
-    matrix[nodeIndex].connections = new_connections;
+    matrix[node.vector.y][node.vector.x].direction = new_direction;
+    matrix[node.vector.y][node.vector.x].connections = new_connections;
 
     matrix = this.getRecalculatedMatrix(matrix);
 
@@ -202,12 +202,14 @@ export default class Netwalk {
 
     const connectedNodes = this.getConnectedNeighborsOf(server, null, matrix);
 
-    for (let index in matrix) {
-      let node = matrix[index];
-      if (node.type === 'server' || connectedNodes.findIndex((n) => n.id === node.id) >= 0) {
-        matrix[index].connected = true;
-      } else {
-        matrix[index].connected = false;
+    for (let x in matrix) {
+      for (let y in matrix[x]) {
+        let node = matrix[x][y];
+        if (node.type === 'server' || connectedNodes.findIndex((n) => n.id === node.id) >= 0) {
+          matrix[x][y].connected = true;
+        } else {
+          matrix[x][y].connected = false;
+        }
       }
     }
 
@@ -319,10 +321,15 @@ export default class Netwalk {
     }
   }
 
-  inBounds(vector) {
+  inBounds(vector, matrix) {
+    const totalRows = matrix.length;
+    if (totalRows === 0) {
+      return false;
+    }
+    const totalColumns = matrix[0].length;
     const x = vector.x;
     const y = vector.y;
-    return x >= 0 && y >= 0 && x < this.totalColumns && y < this.totalRows;
+    return x >= 0 && y >= 0 && x < totalColumns && y < totalRows;
   }
 
   setMatrixTo(matrix) {
@@ -330,38 +337,44 @@ export default class Netwalk {
   }
 
   getServerNode(matrix) {
-    const nodeIndex = matrix.findIndex((node) => node.type === 'server');
 
-    if (nodeIndex < 0) {
-      console.warn('Failed to find server node', matrix);
+    for (let x in matrix) {
+      for (let y in matrix[x]) {
+        let node = matrix[x][y];
+        if (node.type === 'server') {
+          return node;
+        }
+      }
     }
 
-    return matrix[nodeIndex];
+    console.warn('Failed to find server node', matrix);
   }
 
-  findNode(id) {
+  findNodeById(id) {
     const matrix = this.getCurrentMatrix();
-    const nodeIndex = matrix.findIndex((node) => node.id === id);
 
-    if (nodeIndex < 0) {
-      console.warn('Failed to find node', matrix, id);
+    for (let x in matrix) {
+      for (let y in matrix[x]) {
+        let node = matrix[x][y];
+        if (node.id === id) {
+          return node;
+        }
+      }
     }
 
-    return nodeIndex;
+    console.warn('Failed to find node', matrix, id);
   }
 
   findNodeByVector(vector, matrix) {
-    if (!this.inBounds(vector)) {
+    if (!this.inBounds(vector, matrix)) {
       return null;
     }
 
-    const nodeIndex = vector.x + vector.y * this.totalColumns;
-
-    if (!matrix[nodeIndex]) {
+    if (!matrix[vector.y] && !matrix[vector.y][vector.x]) {
       return null;
     }
 
-    return matrix[nodeIndex];
+    return matrix[vector.y][vector.x];
   }
 
 }

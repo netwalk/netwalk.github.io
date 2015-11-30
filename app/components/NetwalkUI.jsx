@@ -14,13 +14,15 @@ export default class NetwalkUI extends Component {
   }
 
   renderNodes() {
-    return this.props.matrix.map((node) => {
-      return <Node key={`node${node.id}`}
-                   id={node.id}
-                   type={node.type}
-                   direction={node.direction}
-                   connected={node.connected}
-                   onRotate={this.props.onRotate} />;
+    return this.props.matrix.map((row) => {
+      return row.map((node) => {
+        return <Node key={`node${node.id}`}
+                     id={node.id}
+                     type={node.type}
+                     direction={node.direction}
+                     connected={node.connected}
+                     onRotate={this.props.onRotate} />;
+      });
     });
   }
 
