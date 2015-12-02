@@ -1,112 +1,497 @@
 import 'array.prototype.findindex';
 import uuid from 'node-uuid';
-import { vector as Vector } from 'vektor';
+import { vector as Vector, matrix as Matrix } from 'vektor';
+import _ from 'underscore';
 
 export default class Netwalk {
 
   constructor() {
     this.matrix = [];
+
+    this.directions = [
+      { name: 'up', vector: new Vector(0, -1) },
+      { name: 'down', vector: new Vector(0, 1) },
+      { name: 'left', vector: new Vector(-1, 0) },
+      { name: 'right', vector: new Vector(1, 0) }
+    ];
+
+    let figures = [];
+
+    // Elbows
+    figures.push({
+      type: 'elbow',
+      direction: 'upright',
+      connections: ['up', 'right']
+    });
+    figures.push({
+      type: 'elbow',
+      direction: 'rightdown',
+      connections: ['right', 'down']
+    });
+    figures.push({
+      type: 'elbow',
+      direction: 'downleft',
+      connections: ['down', 'left']
+    });
+    figures.push({
+      type: 'elbow',
+      direction: 'leftup',
+      connections: ['left', 'up']
+    });
+
+    // Lines
+    figures.push({
+      type: 'line',
+      direction: 'leftright',
+      connections: ['left', 'right']
+    });
+    figures.push({
+      type: 'line',
+      direction: 'updown',
+      connections: ['up', 'down']
+    });
+
+    // Tees
+    figures.push({
+      type: 'tee',
+      direction: 'leftupright',
+      connections: ['left', 'up', 'right']
+    });
+    figures.push({
+      type: 'tee',
+      direction: 'uprightdown',
+      connections: ['up', 'right', 'down']
+    });
+    figures.push({
+      type: 'tee',
+      direction: 'rightdownleft',
+      connections: ['right', 'down', 'left']
+    });
+    figures.push({
+      type: 'tee',
+      direction: 'downleftup',
+      connections: ['down', 'left', 'up']
+    });
+
+    // Computers
+    figures.push({
+      type: 'computer',
+      direction: 'up',
+      connections: ['up']
+    });
+    figures.push({
+      type: 'computer',
+      direction: 'right',
+      connections: ['right']
+    });
+    figures.push({
+      type: 'computer',
+      direction: 'down',
+      connections: ['down']
+    });
+    figures.push({
+      type: 'computer',
+      direction: 'left',
+      connections: ['left']
+    });
+
+    this.figures = figures;
   }
 
   getCurrentMatrix() {
     return this.matrix;
   }
 
-  registerGeneratorCallback(callback) {
-    this.generatorCallback = callback;
+  isMatrixFull(matrix) {
+    for (let y in matrix) {
+      for (let x in matrix[y]) {
+        if (matrix[y][x].connections.length === 0) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
-  generateMatrix(rows, columns) {
-    const callback = this.generatorCallback;
-    let matrix;
-    
-    matrix = [
-      [
-        {
-          id: uuid.v4(),
-          type: 'elbow',
-          direction: 'downleft',
-          connections: ['down', 'left'],
-          connected: true,
-          vector: new Vector(0, 0)
-        },
-        {
-          id: uuid.v4(),
-          type: 'tee',
-          direction: 'leftupright',
-          connections: ['left', 'up', 'right'],
-          connected: true,
-          vector: new Vector(1, 0)
-        },
-        {
-          id: uuid.v4(),
-          type: 'elbow',
-          direction: 'upright',
-          connections: ['up', 'right'],
-          connected: true,
-          vector: new Vector(2, 0)
-        }
-      ],
-      [
-        {
-          id: uuid.v4(),
-          type: 'line',
-          direction: 'leftright',
-          connections: ['left', 'right'],
-          connected: true,
-          vector: new Vector(0, 1)
-        },
-        {
-          id: uuid.v4(),
-          type: 'line',
-          direction: 'updown',
-          connections: ['up', 'down'],
-          connected: true,
-          vector: new Vector(1, 1)
-        },
-        {
-          id: uuid.v4(),
-          type: 'line',
-          direction: 'leftright',
-          connections: ['left', 'right'],
-          connected: true,
-          vector: new Vector(2, 1)
-        }
-      ],
-      [
-        {
-          id: uuid.v4(),
-          type: 'server',
-          direction: 'right',
-          connections: ['right'],
-          vector: new Vector(0, 2)
-        },
-        {
-          id: uuid.v4(),
-          type: 'computer',
-          direction: 'down',
-          connections: ['down'],
-          connected: true,
-          vector: new Vector(1, 2)
-        },
-        {
-          id: uuid.v4(),
-          type: 'computer',
-          direction: 'up',
-          connections: ['up'],
-          connected: true,
-          vector: new Vector(2, 2)
-        }
-      ]
-    ];
+  takeStepToBuildMatrix(matrix) {
 
-    matrix = this.getRecalculatedMatrix(matrix);
+    if (this.isMatrixFull(matrix)) {
+      return matrix;
+    }
+
+    let template;
+    let rows = matrix.length,
+        columns = matrix[0].length,
+        server = this.getServerNode(matrix);
+
+    if (!server) {
+
+      let x = _.random(0, columns - 1),
+          y = _.random(0, rows - 1);
+
+      server = _.extend(matrix[y][x], {
+        type: 'server',
+        connected: true
+      });
+
+      matrix[y][x] = server;
+
+      let neighbors = this.getNeighborsReadyToConnectTo(server, matrix);
+      if (neighbors.length > 0) {
+        let random_neighbor = neighbors[_.random(neighbors.length - 1)];
+        let connection_direction = this.getConnectionDirectionBetweenNodes(server, random_neighbor);
+        matrix = this.performDoubleSidedConnectBetween(server, random_neighbor, matrix);
+      }
+
+      // set server as configured
+      matrix[y][x] = _.extend(matrix[y][x], {
+        configured: true
+      });
+
+      return matrix;
+    }
+
+    let unclosedNode = this.getUnclosedNodeConnectedTo(server, matrix);
+    if (unclosedNode) {
+      let neighbors = this.getNeighborsReadyToConnectTo(unclosedNode, matrix);
+      if (neighbors.length > 0) {
+        _.each(neighbors, function(neighbor) {
+          if (this.nodeCanAcceptNewConnections(unclosedNode, matrix)) {
+            matrix = this.performDoubleSidedConnectBetween(unclosedNode, neighbor, matrix);
+          }
+        }.bind(this));
+      }
+    }
+
+    return matrix;
+  }
+  
+  nodeCanAcceptNewConnections(node, matrix) {
+    node = matrix[node.vector.y][node.vector.x];
+
+    if (node.connections.length >= 3) {
+      return false;
+    }
+
+    return true;
+  }
+
+  performDoubleSidedConnectBetween(node1, node2, matrix) {
+    node1 = matrix[node1.vector.y][node1.vector.x];
+    node2 = matrix[node2.vector.y][node2.vector.x];
+
+    let connection_direction = this.getConnectionDirectionBetweenNodes(node1, node2);
+    matrix = this.connectNode(node1, connection_direction, matrix);
+    matrix = this.connectNode(node2, this.getOppositeDirectionOf(connection_direction), matrix);
+    return matrix;
+  }
+
+  getNodeTypeOf(node, matrix) {
+    node = matrix[node.vector.y][node.vector.x];
+
+    switch (node.connections.length) {
+      case 3:
+        return 'tee';
+        break;
+      case 2:
+        if (
+            (_.indexOf(node.connections, 'up') !== -1 && _.indexOf(node.connections, 'down') !== -1)
+             ||
+            (_.indexOf(node.connections, 'left') !== -1 && _.indexOf(node.connections, 'right') !== -1)
+           ){
+          return 'line';
+        }
+        return 'elbow';
+        break;
+      case 1:
+        return 'computer';
+        break;
+    }
+  }
+
+  connectNode(node, direction, matrix) {
+    node = matrix[node.vector.y][node.vector.x];
+
+    let x = node.vector.x,
+        y = node.vector.y,
+        connections = _.union([direction], node.connections);
+
+    matrix[y][x] = node = _.extend(node, {
+      direction: this.getDirectionByConnections(connections),
+      connections: connections
+    });
+
+    matrix[y][x] = node = _.extend(node, {
+      type: (node.type === 'server') ? 'server' : this.getNodeTypeOf(node, matrix)
+    });
+
+    // set node as "configured" if that is it's 3rd connection
+    // or if there are simply no available nodes to connect to
+    let neighbors = this.getNeighborsReadyToConnectTo(node, matrix);
+    if (neighbors.length === 0 || connections.length === 3) {
+      matrix[y][x] = node = _.extend(matrix[y][x], {
+        configured: true
+      });
+    }
+
+    return matrix;
+  }
+
+  getDirectionByConnections(connections) {
+    if (_.indexOf(connections, 'left') !== -1
+        && _.indexOf(connections, 'up') !== -1
+        && _.indexOf(connections, 'right') !== -1) {
+      return 'leftupright';
+    }
+    if (_.indexOf(connections, 'up') !== -1
+        && _.indexOf(connections, 'right') !== -1
+        && _.indexOf(connections, 'down') !== -1) {
+      return 'uprightdown';
+    }
+    if (_.indexOf(connections, 'right') !== -1
+        && _.indexOf(connections, 'down') !== -1
+        && _.indexOf(connections, 'left') !== -1) {
+      return 'rightdownleft';
+    }
+    if (_.indexOf(connections, 'down') !== -1
+        && _.indexOf(connections, 'left') !== -1
+        && _.indexOf(connections, 'up') !== -1) {
+      return 'downleftup';
+    }
+
+    if (_.indexOf(connections, 'up') !== -1
+        && _.indexOf(connections, 'right') !== -1) {
+      return 'upright';
+    }
+    if (_.indexOf(connections, 'right') !== -1
+        && _.indexOf(connections, 'down') !== -1) {
+      return 'rightdown';
+    }
+    if (_.indexOf(connections, 'down') !== -1
+        && _.indexOf(connections, 'left') !== -1) {
+      return 'downleft';
+    }
+    if (_.indexOf(connections, 'left') !== -1
+        && _.indexOf(connections, 'up') !== -1) {
+      return 'leftup';
+    }
+
+    if (_.indexOf(connections, 'up') !== -1
+        && _.indexOf(connections, 'down') !== -1) {
+      return 'updown';
+    }
+    if (_.indexOf(connections, 'left') !== -1
+        && _.indexOf(connections, 'right') !== -1) {
+      return 'leftright';
+    }
+
+    if (_.indexOf(connections, 'up') !== -1) {
+      return 'up';
+    }
+    if (_.indexOf(connections, 'right') !== -1) {
+      return 'right';
+    }
+    if (_.indexOf(connections, 'down') !== -1) {
+      return 'down';
+    }
+    if (_.indexOf(connections, 'left') !== -1) {
+      return 'left';
+    }
+  }
+
+  getNeighborsOf(node, matrix) {
+    let neighbors = [];
+    _.each(this.directions, (function(direction) {
+      let neighbor = this.findNodeByVector(node.vector.add(direction.vector), matrix);
+      if (neighbor) {
+        neighbors.push(neighbor);
+      }
+    }).bind(this));
+    return neighbors;
+  }
+
+  getNeighborsReadyToConnectTo(node, matrix) {
+    node = matrix[node.vector.y][node.vector.x];
+
+    let neighbors = [];
+
+    if (node.configured) {
+      return [];
+    }
+
+    _.each(this.directions, (function(direction) {
+
+      // Avoid already connected neighbors
+      if (_.indexOf(node.connections, direction) !== -1) {
+        return;
+      }
+
+      let neighbor = this.findNodeByVector(node.vector.add(direction.vector), matrix);
+
+      if (neighbor
+        && !neighbor.configured
+        && !this.nodesAreIndirectlyConnected(node, neighbor, matrix)) {
+        neighbors.push(neighbor);
+      }
+
+    }).bind(this));
+
+    return neighbors;
+  }
+
+  nodesAreIndirectlyConnected(node1, node2, matrix) {
+    node1 = matrix[node1.vector.y][node1.vector.x];
+    node2 = matrix[node2.vector.y][node2.vector.x];
+
+    let connection_direction = this.getConnectionDirectionBetweenNodes(node1, node2);
+    return this.findNodeConnectedTo(node1, node2, connection_direction, matrix);
+  }
+
+  findNodeConnectedTo(node1, needle, exceptDirection, matrix) {
+    node1 = matrix[node1.vector.y][node1.vector.x];
+    needle = matrix[needle.vector.y][needle.vector.x];
+
+    if (node1.id === needle.id) {
+      return true;
+    }
+
+    let connected_neighbors = this.getConnectedNeighborsOf(node1, exceptDirection, matrix);
+    if (connected_neighbors.length > 0) {
+      for (let i in connected_neighbors) {
+        let neighbor = connected_neighbors[i];
+        let connection_direction = this.getConnectionDirectionBetweenNodes(node1, neighbor);
+        if (this.findNodeConnectedTo(neighbor, needle, this.getOppositeDirectionOf(connection_direction), matrix)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  getUnclosedNodeConnectedTo(node, matrix) {
+    node = matrix[node.vector.y][node.vector.x];
+
+    let nodes = this.getUnclosedNodesConnectedTo(node, null, matrix);
+    let picked_node;
+    if (nodes.length > 0) {
+      picked_node = nodes[_.random(nodes.length - 1)];
+    }
+    return picked_node;
+  }
+
+  getUnclosedNodesConnectedTo(node, exceptDirection, matrix) {
+    node = matrix[node.vector.y][node.vector.x];
+
+    // If this node is not marked as "configured" then it is considered
+    // unclosed so we return it
+    if (!node.configured) {
+      return [node];
+    }
+
+    if (this.getNeighborsReadyToConnectTo(node, matrix).length > 0) {
+      return [node];
+    }
+
+    let unclosed_nodes = [];
+
+    let connected_nodes = this.getConnectedNeighborsOf(node, exceptDirection, matrix)
+
+    _.each(connected_nodes, (function(connected_node) {
+      let unclosed_children = this.getUnclosedNodesConnectedTo(connected_node, this.getConnectionDirectionBetweenNodes(connected_node, node), matrix);
+      if (unclosed_children) {
+        _.each(unclosed_children, function(unclosed_child) {
+          unclosed_nodes.push(unclosed_child);
+        });
+      }
+    }).bind(this));
+
+    return unclosed_nodes;
+  }
+
+  nodeHasEmptyNeighbors(node, matrix) {
+    let surrounding_nodes = this.getNeighborsOf(node, matrix);
+    for (let i in surrounding_nodes) {
+      let neighbor = surrounding_nodes[i];
+      if (neighbor.connections.length === 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  markConfiguredNodes(matrix) {
+    for (let y in matrix) {
+      for (let x in matrix[y]) {
+        let node = matrix[y][x];
+        if (!node.configured && node.connections.length > 0 && !this.nodeHasEmptyNeighbors(node, matrix)) {
+          matrix[y][x] = _.extend(matrix[y][x], {
+            configured: true
+          });
+        }
+      }
+    }
+    return matrix;
+  }
+
+  initializeMatrix(rows, columns) {
+    let matrix = new Array(rows);
+    for (var y = 0; y < rows; ++y) {
+      matrix[y] = new Array(columns);
+      for (var x = 0; x < columns; ++x) {
+        matrix[y][x] = {
+          id: uuid.v4(),
+          type: null,
+          direction: null,
+          connections: [],
+          configured: false,
+          connected: false,
+          vector: new Vector(x, y)
+        };
+      }
+    }
+    return matrix;
+  }
+
+  generateMatrixAsync(rows, columns, callback, interval) {
+    let matrix = this.initializeMatrix(rows, columns);
+    interval = interval || 10;
+
+    let generate = (function(timestamp) {
+
+      matrix = this.takeStepToBuildMatrix(matrix);
+      matrix = this.markConfiguredNodes(matrix);
+      matrix = this.getRecalculatedMatrix(matrix);
+
+      this.matrix = matrix;
+
+      if (typeof callback === 'function') {
+        callback(matrix);
+      }
+
+      if (!this.isMatrixFull(matrix)) {
+        setTimeout(function() {
+          window.requestAnimationFrame(generate);
+        }, interval);
+      }
+    }).bind(this);
+    window.requestAnimationFrame(generate);
+  }
+
+  generateMatrix(rows, columns, callback) {
+    let matrix = this.initializeMatrix(rows, columns);
+
+    while (!this.isMatrixFull(matrix)) {
+      matrix = this.takeStepToBuildMatrix(matrix);
+      matrix = this.markConfiguredNodes(matrix);
+      matrix = this.getRecalculatedMatrix(matrix);
+    }
+
+    this.matrix = matrix;
 
     if (typeof callback === 'function') {
       callback(matrix);
     }
-
-    this.matrix = matrix;
 
     return matrix;
   }
@@ -198,9 +583,7 @@ export default class Netwalk {
   }
 
   getRecalculatedMatrix(matrix) {
-    const server = this.getServerNode(matrix);
-
-    const connectedNodes = this.getConnectedNeighborsOf(server, null, matrix);
+    const connectedNodes = this.getAllNodesConnectedToServer(matrix);
 
     for (let x in matrix) {
       for (let y in matrix[x]) {
@@ -216,12 +599,61 @@ export default class Netwalk {
     return matrix;
   }
 
+  getAllNodesConnectedToServer(matrix) {
+    const server = this.getServerNode(matrix);
+    return this.getAllNodesConnectedToNode(server, null, matrix);
+  }
+
+  getAllNodesConnectedToNode(node, exceptDirection, matrix, current_nodes) {
+    current_nodes = current_nodes || [];
+    let connected_nodes = [];
+    let connected_neighbors = this.getConnectedNeighborsOf(node, exceptDirection, matrix);
+
+    if (connected_neighbors.length > 0) {
+
+      _.each(connected_neighbors, function(neighbor) {
+
+        // Stop the recursion if this node was already served before
+        if (_.indexOf(current_nodes, neighbor) !== -1) {
+          return;
+        }
+
+        connected_nodes.push(neighbor);
+
+        let nodes_connected_to_neighbor = this.getAllNodesConnectedToNode(neighbor, this.getConnectionDirectionBetweenNodes(neighbor, node), matrix, _.union(current_nodes, connected_neighbors));
+
+        _.each(nodes_connected_to_neighbor, function(node_connected_to_neighbor) {
+          connected_nodes.push(node_connected_to_neighbor);
+        });
+
+      }.bind(this));
+
+    }
+
+    return connected_nodes;
+  }
+
+  getConnectionDirectionBetweenNodes(node1, node2) {
+    let x1 = node1.vector.x,
+        x2 = node2.vector.x,
+        y1 = node1.vector.y,
+        y2 = node2.vector.y;
+
+    if (x1 === x2 && y1 < y2) {
+      return 'down';
+    } else if (x1 === x2 && y1 > y2) {
+      return 'up';
+    } else if (y1 === y2 && x1 < x2) {
+      return 'right';
+    } else if (y1 === y2 && x1 > x2) {
+      return 'left';
+    }
+
+    return;
+  }
+
   getConnectedNeighborsOf(node, exceptDirection, matrix) {
     let connectedNodes = [];
-
-    if (node.type === 'computer') {
-      return;
-    }
 
     let directions = [
       { name: 'up', vector: new Vector(0, -1) },
@@ -230,25 +662,22 @@ export default class Netwalk {
       { name: 'right', vector: new Vector(1, 0) }
     ];
 
-    for (let index in directions) {
-      let direction = directions[index];
+    _.each(directions, (function(direction) {
 
       if (exceptDirection === direction.name) {
-        continue;
+        return;
       }
 
       let neighbor = this.findNodeByVector(node.vector.add(direction.vector), matrix);
+
       if (!neighbor) {
-        continue;
+        return;
       }
+
       if (this.nodesAreConnected(node, neighbor, matrix)) {
         connectedNodes.push(neighbor);
-        let nodes = this.getConnectedNeighborsOf(neighbor, this.getOppositeDirectionOf(direction.name), matrix);
-        for (let key in nodes) {
-          connectedNodes.push(nodes[key]);
-        }
       }
-    }
+    }).bind(this));
 
     return connectedNodes;
   }
@@ -347,7 +776,7 @@ export default class Netwalk {
       }
     }
 
-    console.warn('Failed to find server node', matrix);
+    return null;
   }
 
   findNodeById(id) {
