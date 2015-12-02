@@ -10,7 +10,7 @@ export default class Node extends Component {
     return <div className={"Node" + (this.props.connected ? '--connected' : '')}
                 onClick={this.rotate.bind(this)}>
 
-             <div className={"Node__" + this.props.type + "--" + this.props.direction}>
+             <div className={"Node__" + this.props.type + (this.props.direction ? "--" + this.props.direction : '')}>
                {this.props.type} (current direction: {this.props.direction})
              </div>
 

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import NetwalkUI from './NetwalkUI';
 import Netwalk from './Netwalk';
 
-export default class NetwalkGame extends Component {
+class NetwalkGame extends Component {
 
   constructor(props) {
     super(props);
@@ -16,13 +16,23 @@ export default class NetwalkGame extends Component {
 
     this.Netwalk = new Netwalk;
 
-    this.Netwalk.registerGeneratorCallback((function(matrix) {
+    this.Netwalk.generateMatrixAsync(this.props.rows, this.props.columns, (function(matrix) {
       this.setState({
         matrix: matrix
       });
-    }).bind(this));
+    }).bind(this), 10);
 
-    this.Netwalk.generateMatrix(3, 3);
+    // Option #2
+    // this.setState({
+    //   matrix: this.Netwalk.generateMatrix(this.props.rows, this.props.columns)
+    // });
+
+    // Option #3
+    // this.Netwalk.generateMatrix(this.props.rows, this.props.columns, (function(matrix) {
+    //   this.setState({
+    //     matrix: matrix
+    //   });
+    // }).bind(this));
   }
 
   render() {
@@ -37,3 +47,10 @@ export default class NetwalkGame extends Component {
   }
 
 }
+
+NetwalkGame.defaultProps = {
+  rows: 3,
+  columns: 3
+}
+
+export default NetwalkGame;
