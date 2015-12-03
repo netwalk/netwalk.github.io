@@ -1,0 +1,98 @@
+.NetwalkUI {
+  display: flex;
+  flex-direction: column;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.NetwalkUI-row {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+}
+
+.NetwalkUI-node,
+.NetwalkUI-node--connected {
+  flex-grow: 1;
+  position: relative;
+  
+  &::before{
+    content: "";
+    display: block;
+    padding-top: 100%;  /* initial ratio of 1:1*/
+  }
+}
+
+.NetwalkUI-node-server {
+  position: absolute;
+  top: 20%; right: 20%; bottom: 20%; left: 20%;
+  background-color: #CF9134;
+}
+
+.NetwalkUI-node-computer {
+  position: absolute;
+  top: 20%; right: 20%; bottom: 30%; left: 20%;
+  background-color: #656E74;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    left: -20%;
+    background-color: #B2B7BB;
+    width: 140%;
+    height: 20%;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 20%; right: 20%; bottom: 20%; left: 20%;
+    background-color: #7B858C;
+    width: 60%;
+    height: 60%;
+    
+    .NetwalkUI-node--connected & {
+      background-color: #0CCC29;
+    }
+  }
+}
+
+.NetwalkUI-node-uplink {
+  position: absolute;
+  top: 0%; right: 40%; bottom: 40%; left: 40%;
+  background-color: #ADCF99;
+  .NetwalkUI-node--connected & {
+    // background-color: #0CCC29;
+  }
+}
+
+.NetwalkUI-node-rightlink {
+  position: absolute;
+  top: 40%; right: 0%; bottom: 40%; left: 40%;
+  background-color: #ADCF99; 
+  .NetwalkUI-node--connected & {
+    // background-color: #0CCC29;
+  }
+}
+
+.NetwalkUI-node-downlink {
+  position: absolute;
+  top: 40%; right: 40%; bottom: 0%; left: 40%;
+  background-color: #ADCF99; 
+  .NetwalkUI-node--connected & {
+    // background-color: #0CCC29;
+  }
+}
+
+.NetwalkUI-node-leftlink {
+  position: absolute;
+  top: 40%; right: 40%; bottom: 40%; left: 0%;
+  background-color: #ADCF99; 
+  .NetwalkUI-node--connected & {
+    // background-color: #0CCC29;
+  }
+}

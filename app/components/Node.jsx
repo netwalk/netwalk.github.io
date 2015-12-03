@@ -7,12 +7,16 @@ export default class Node extends Component {
   }
 
   render() {
-    return <div className={"Node" + (this.props.connected ? '--connected' : '')}
+    return <div className={"NetwalkUI-node" + (this.props.connected ? '--connected' : '')}
                 onClick={this.rotate.bind(this)}>
 
-             <div className={"Node__" + this.props.type + (this.props.direction ? "--" + this.props.direction : '')}>
-               {this.props.type} (current direction: {this.props.direction})
-             </div>
+             {this.props.connections.map(connection => {
+               return <div className={"NetwalkUI-node-" + connection + "link"}></div>;
+             })}
+
+            {this.props.type === 'computer' ? <div className="NetwalkUI-node-computer"></div> : ''}
+
+            {this.props.type === 'server' ? <div className="NetwalkUI-node-server"></div> : ''}
 
            </div>;
   }

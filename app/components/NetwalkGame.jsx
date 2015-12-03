@@ -50,7 +50,7 @@ class NetwalkGame extends Component {
 
 NetwalkGame.defaultProps = {
   rows: 3,
-  columns: 3
+  columns: 5
 }
 
 export default NetwalkGame;
