@@ -40,9 +40,8 @@ class NetwalkGame extends Component {
   }
 
   rotateNode(id) {
-    this.Netwalk.rotateNode(id);
     this.setState({
-      matrix: this.Netwalk.getCurrentMatrix()
+      matrix: this.Netwalk.rotateNode(id, this.state.matrix)
     });
   }
 

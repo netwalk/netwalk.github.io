@@ -6,7 +6,6 @@ import _ from 'underscore';
 export default class Netwalk {
 
   constructor() {
-    this.matrix = [];
 
     this.directions = [
       { name: 'up', vector: new Vector(0, -1) },
@@ -96,10 +95,6 @@ export default class Netwalk {
     });
 
     this.figures = figures;
-  }
-
-  getCurrentMatrix() {
-    return this.matrix;
   }
 
   isMatrixFull(matrix) {
@@ -463,8 +458,6 @@ export default class Netwalk {
       matrix = this.markConfiguredNodes(matrix);
       matrix = this.getRecalculatedMatrix(matrix);
 
-      this.matrix = matrix;
-
       if (typeof callback === 'function') {
         callback(matrix);
       }
@@ -487,8 +480,6 @@ export default class Netwalk {
       matrix = this.getRecalculatedMatrix(matrix);
     }
 
-    this.matrix = matrix;
-
     if (typeof callback === 'function') {
       callback(matrix);
     }
@@ -496,9 +487,8 @@ export default class Netwalk {
     return matrix;
   }
 
-  rotateNode(id) {
-    let matrix = this.getCurrentMatrix();
-    const node = this.findNodeById(id);
+  rotateNode(id, matrix) {
+    const node = this.findNodeById(id, matrix);
 
     if (!node) {
       return;
@@ -579,7 +569,7 @@ export default class Netwalk {
 
     matrix = this.getRecalculatedMatrix(matrix);
 
-    this.setMatrixTo(matrix);
+    return matrix;
   }
 
   getRecalculatedMatrix(matrix) {
@@ -761,10 +751,6 @@ export default class Netwalk {
     return x >= 0 && y >= 0 && x < totalColumns && y < totalRows;
   }
 
-  setMatrixTo(matrix) {
-    this.matrix = matrix;
-  }
-
   getServerNode(matrix) {
 
     for (let x in matrix) {
@@ -779,9 +765,7 @@ export default class Netwalk {
     return null;
   }
 
-  findNodeById(id) {
-    const matrix = this.getCurrentMatrix();
-
+  findNodeById(id, matrix) {
     for (let x in matrix) {
       for (let y in matrix[x]) {
         let node = matrix[x][y];
