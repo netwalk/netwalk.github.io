@@ -20,19 +20,20 @@ class NetwalkGame extends Component {
       this.setState({
         matrix: matrix
       });
+      if (this.Netwalk.isMatrixReady(matrix)) {
+        this.Netwalk.randomizeMatrixAsync(matrix, (function(matrix) {
+          this.setState({
+            matrix: matrix
+          });
+        }).bind(this), 10);
+      }
     }).bind(this), 10);
 
     // Option #2
+    // const matrix = this.Netwalk.generateMatrix(this.props.rows, this.props.columns);
     // this.setState({
-    //   matrix: this.Netwalk.generateMatrix(this.props.rows, this.props.columns)
+    //   matrix: this.Netwalk.randomizeMatrix(matrix)
     // });
-
-    // Option #3
-    // this.Netwalk.generateMatrix(this.props.rows, this.props.columns, (function(matrix) {
-    //   this.setState({
-    //     matrix: matrix
-    //   });
-    // }).bind(this));
   }
 
   render() {

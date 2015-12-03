@@ -97,7 +97,7 @@ export default class Netwalk {
     this.figures = figures;
   }
 
-  isMatrixFull(matrix) {
+  isMatrixReady(matrix) {
     for (let y in matrix) {
       for (let x in matrix[y]) {
         if (matrix[y][x].connections.length === 0) {
@@ -108,9 +108,20 @@ export default class Netwalk {
     return true;
   }
 
+  isMatrixRandomized(matrix) {
+    for (let y in matrix) {
+      for (let x in matrix[y]) {
+        if (!matrix[y][x].randomized) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   takeStepToBuildMatrix(matrix) {
 
-    if (this.isMatrixFull(matrix)) {
+    if (this.isMatrixReady(matrix)) {
       return matrix;
     }
 
@@ -421,10 +432,64 @@ export default class Netwalk {
           connections: [],
           configured: false,
           connected: false,
+          randomized: false,
           vector: new Vector(x, y)
         };
       }
     }
+    return matrix;
+  }
+
+  takeStepToRandomizeMatrix(matrix) {
+    let rows = matrix.length,
+        columns = matrix[0].length,
+        y = _.random(rows - 1),
+        x = _.random(columns - 1);
+
+    let node = matrix[y][x];
+    if (node.randomized) {
+      if (this.isMatrixRandomized(matrix)) {
+        return matrix;
+      }
+      return this.takeStepToRandomizeMatrix(matrix);
+    }
+
+    for (let i = 0; i <= _.random(3); i++) {
+      matrix = this.rotateNode(matrix[y][x].id, matrix);
+    }
+    matrix[y][x].randomized = true;
+
+    return matrix;
+  }
+
+  randomizeMatrixAsync(matrix, callback, interval) {
+    interval = interval || 10;
+
+    let randomize = (function(timestamp) {
+
+      matrix = this.takeStepToRandomizeMatrix(matrix);
+      matrix = this.getRecalculatedMatrix(matrix);
+
+      if (typeof callback === 'function') {
+        callback(matrix);
+      }
+
+      if (!this.isMatrixRandomized(matrix)) {
+        setTimeout(function() {
+          window.requestAnimationFrame(randomize);
+        }, interval);
+      }
+    }).bind(this);
+    window.requestAnimationFrame(randomize);
+  }
+
+  randomizeMatrix(matrix) {
+
+    while (!this.isMatrixRandomized(matrix)) {
+      matrix = this.takeStepToRandomizeMatrix(matrix);
+      matrix = this.getRecalculatedMatrix(matrix);
+    }
+
     return matrix;
   }
 
@@ -442,7 +507,7 @@ export default class Netwalk {
         callback(matrix);
       }
 
-      if (!this.isMatrixFull(matrix)) {
+      if (!this.isMatrixReady(matrix)) {
         setTimeout(function() {
           window.requestAnimationFrame(generate);
         }, interval);
@@ -451,17 +516,13 @@ export default class Netwalk {
     window.requestAnimationFrame(generate);
   }
 
-  generateMatrix(rows, columns, callback) {
+  generateMatrix(rows, columns) {
     let matrix = this.initializeMatrix(rows, columns);
 
-    while (!this.isMatrixFull(matrix)) {
+    while (!this.isMatrixReady(matrix)) {
       matrix = this.takeStepToBuildMatrix(matrix);
       matrix = this.markConfiguredNodes(matrix);
       matrix = this.getRecalculatedMatrix(matrix);
-    }
-
-    if (typeof callback === 'function') {
-      callback(matrix);
     }
 
     return matrix;
