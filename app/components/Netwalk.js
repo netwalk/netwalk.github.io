@@ -162,8 +162,6 @@ export default class Netwalk {
   }
   
   nodeCanAcceptNewConnections(node, matrix) {
-    node = matrix[node.vector.y][node.vector.x];
-
     if (node.connections.length >= 3) {
       return false;
     }
@@ -172,9 +170,6 @@ export default class Netwalk {
   }
 
   performDoubleSidedConnectBetween(node1, node2, matrix) {
-    node1 = matrix[node1.vector.y][node1.vector.x];
-    node2 = matrix[node2.vector.y][node2.vector.x];
-
     let connection_direction = this.getConnectionDirectionBetweenNodes(node1, node2);
     matrix = this.connectNode(node1, connection_direction, matrix);
     matrix = this.connectNode(node2, this.getOppositeDirectionOf(connection_direction), matrix);
@@ -182,8 +177,6 @@ export default class Netwalk {
   }
 
   getNodeTypeOf(node, matrix) {
-    node = matrix[node.vector.y][node.vector.x];
-
     switch (node.connections.length) {
       case 3:
         return 'tee';
@@ -205,8 +198,6 @@ export default class Netwalk {
   }
 
   connectNode(node, direction, matrix) {
-    node = matrix[node.vector.y][node.vector.x];
-
     let x = node.vector.x,
         y = node.vector.y,
         connections = _.union([direction], node.connections);
@@ -306,8 +297,6 @@ export default class Netwalk {
   }
 
   getNeighborsReadyToConnectTo(node, matrix) {
-    node = matrix[node.vector.y][node.vector.x];
-
     let neighbors = [];
 
     if (node.configured) {
@@ -335,17 +324,11 @@ export default class Netwalk {
   }
 
   nodesAreIndirectlyConnected(node1, node2, matrix) {
-    node1 = matrix[node1.vector.y][node1.vector.x];
-    node2 = matrix[node2.vector.y][node2.vector.x];
-
     let connection_direction = this.getConnectionDirectionBetweenNodes(node1, node2);
     return this.findNodeConnectedTo(node1, node2, connection_direction, matrix);
   }
 
   findNodeConnectedTo(node1, needle, exceptDirection, matrix) {
-    node1 = matrix[node1.vector.y][node1.vector.x];
-    needle = matrix[needle.vector.y][needle.vector.x];
-
     if (node1.id === needle.id) {
       return true;
     }
@@ -365,8 +348,6 @@ export default class Netwalk {
   }
 
   getUnclosedNodeConnectedTo(node, matrix) {
-    node = matrix[node.vector.y][node.vector.x];
-
     let nodes = this.getUnclosedNodesConnectedTo(node, null, matrix);
     let picked_node;
     if (nodes.length > 0) {
@@ -376,7 +357,6 @@ export default class Netwalk {
   }
 
   getUnclosedNodesConnectedTo(node, exceptDirection, matrix) {
-    node = matrix[node.vector.y][node.vector.x];
 
     // If this node is not marked as "configured" then it is considered
     // unclosed so we return it
