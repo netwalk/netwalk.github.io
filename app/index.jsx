@@ -1,5 +1,10 @@
 import './main.scss';
 
+import './manifest.json';
+import './launcher-icon-2x.png';
+import './launcher-icon-3x.png';
+import './launcher-icon-4x.png';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import NetwalkGame from './components/NetwalkGame';

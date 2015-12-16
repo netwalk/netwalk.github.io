@@ -31,6 +31,16 @@ var common = {
         test: /\.jsx?$/,
         loaders: ['babel'],
         include: PATHS.app
+      },
+      {
+        test: /manifest.json?$/,
+        loader: 'file?name=[name].[ext]',
+        include: PATHS.app
+      },
+      {
+        test: /launcher-icon-\dx.png?$/,
+        loader: 'file?name=[name].[ext]',
+        include: PATHS.app
       }
     ]
   },
