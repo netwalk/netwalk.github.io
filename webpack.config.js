@@ -36,7 +36,9 @@ var common = {
   },
   plugins: [
     new HtmlwebpackPlugin({
-      title: 'Netwalk game'
+      title: 'Netwalk game',
+      template: path.join(PATHS.app, 'template.html'),
+      inject: 'body'
     })
   ]
 };
