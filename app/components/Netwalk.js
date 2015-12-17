@@ -119,6 +119,17 @@ export default class Netwalk {
     return true;
   }
 
+  isMatrixSolved(matrix) {
+    for (let y in matrix) {
+      for (let x in matrix[y]) {
+        if (!matrix[y][x].connected) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   takeStepToBuildMatrix(matrix) {
 
     if (this.isMatrixReady(matrix)) {

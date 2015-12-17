@@ -34,11 +34,16 @@ class NetwalkGame extends Component {
   }
 
   render() {
-    let Play;
+    let Play,
+        Replay;
 
     // Only show "Start Game" button if game has not yet started
-    if (!this.state.gameStarted) {
-      Play = <PlayButton onPlay={this.onPlay.bind(this)} />;
+    if (!this.state.gameStarted && !this.state.gameEnded) {
+      Play = <PlayButton onPlay={this.onPlay.bind(this)} title="New Game" />;
+    }
+
+    if (!this.state.gameStarted && this.state.gameEnded) {
+      Replay = <PlayButton onPlay={this.onPlay.bind(this)} title="Play again?" />;
     }
 
     return (
@@ -47,13 +52,20 @@ class NetwalkGame extends Component {
           <NetwalkUI matrix={this.state.matrix} onRotate={this.rotateNode.bind(this)} />
         </div>
         {Play}
+        {Replay}
       </div>
     );
   }
 
   rotateNode(id) {
+    let matrix = this.Netwalk.rotateNode(id, this.state.matrix),
+        gameEnded = this.Netwalk.isMatrixSolved(matrix),
+        gameStarted = !gameEnded;
+
     this.setState(_.extend(this.state, {
-      matrix: this.Netwalk.rotateNode(id, this.state.matrix)
+      matrix: matrix,
+      gameStarted: gameStarted,
+      gameEnded: gameEnded
     }));
   }
 

@@ -10,7 +10,7 @@ export default class PlayButton extends Component {
         </div>
         <div style={styles.base}>
           <button style={styles.button} onClick={this.props.onPlay}>
-            New Game
+            {this.props.title}
           </button>
         </div>
       </div>
