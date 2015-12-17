@@ -15,8 +15,12 @@ const viewport = {
   width: document.documentElement.clientWidth
 };
 const plot = {
-  width: 200,
+  width: 150,
   height: 100
+}
+if (viewport.width > 420) {
+  plot.width = 200;
+  plot.height = 100;
 }
 if (viewport.width > 520) {
   plot.width = 400;
