@@ -1,45 +1,34 @@
 import './main.scss';
 
-import './manifest.json';
-import './launcher-icon-2x.png';
-import './launcher-icon-3x.png';
-import './launcher-icon-4x.png';
-
 import React from 'react';
-import ReactDOM from 'react-dom';
-import NetwalkGame from './components/NetwalkGame';
+import { render } from 'react-dom';
+import App from './components/App';
+import Logo from './components/Logo';
+import Subtitle from './components/Subtitle';
+import GamePlot from './components/GamePlot';
+import HowToPlay from './components/HowToPlay';
 
-const app = document.createElement('div');
-app.style.width = '100%';
-app.style.height = document.documentElement.clientHeight+'px';
-document.body.appendChild(app);
+const root = document.createElement('div');
+document.body.appendChild(root);
 
-let width = app.offsetWidth,
-    height = app.offsetHeight,
-    multiplier = 100;
-
-// Convert 639 to 600, 231 to 200, 
-if (width >= multiplier) {
-  width -= width % multiplier;
-} else {
-  width = multiplier
+const viewport = {
+  width: document.documentElement.clientWidth
+};
+const plot = {
+  width: 200,
+  height: 100
 }
-if (height >= multiplier) {
-  height -= height % multiplier;
-} else {
-  height = multiplier;
+if (viewport.width > 520) {
+  plot.width = 400;
+  plot.height = 100;
 }
 
-let difficulty_level = 1,
-    node_size;
-
-if (width >= height) {
-  node_size = width / (width / multiplier) / difficulty_level;
-} else if (height > width) {
-  node_size = height / (height / multiplier) / difficulty_level;
-}
-
-const rows = Math.floor(height / node_size);
-const columns = Math.floor(width / node_size);
-
-ReactDOM.render(<NetwalkGame rows={rows} columns={columns} />, app);
+render(
+  <App>
+    <Logo />
+    <Subtitle />
+    <GamePlot width={plot.width} height={plot.height} />
+    <HowToPlay />
+  </App>,
+  root
+)
