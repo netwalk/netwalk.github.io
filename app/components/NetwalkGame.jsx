@@ -23,10 +23,14 @@ class NetwalkGame extends Component {
       gameStarted: false,
       gameEnded: false
     };
+
+    this.rows = this.props.rows;
   }
 
   componentDidMount() {
     this.generateMatrix({
+      rows: this.props.rows,
+      columns: this.props.columns,
       animate: this.props.animate,
       animationWait: this.props.animationWait,
       randomize: this.props.randomize
@@ -35,7 +39,8 @@ class NetwalkGame extends Component {
 
   render() {
     let Play,
-        Replay;
+        Replay,
+        LevelUp;
 
     // Only show "Start Game" button if game has not yet started
     if (!this.state.gameStarted && !this.state.gameEnded) {
@@ -46,8 +51,18 @@ class NetwalkGame extends Component {
       Replay = <PlayButton onPlay={this.onPlay.bind(this)} title="Play again?" />;
     }
 
+    if (this.state.gameStarted && !this.state.gameEnded) {
+      LevelUp = <div>
+        Too easy?
+        <button onClick={this.addRow.bind(this)}>Add row</button>
+        Too hard?
+        <button onClick={this.removeRow.bind(this)}>Remove row</button>
+        </div>;
+    }
+
     return (
       <div style={styles.base}>
+        {LevelUp}
         <div style={[!this.state.gameStarted && styles.board]}>
           <NetwalkUI matrix={this.state.matrix} onRotate={this.rotateNode.bind(this)} />
         </div>
@@ -69,12 +84,36 @@ class NetwalkGame extends Component {
     }));
   }
 
+  addRow() {
+    this.rows++;
+    this.generateMatrix({
+      rows: this.rows,
+      columns: this.props.columns,
+      animate: false,
+      randomize: true
+    });
+  }
+
+  removeRow() {
+    if (this.rows > 2) {
+      this.rows--
+      this.generateMatrix({
+        rows: this.rows,
+        columns: this.props.columns,
+        animate: false,
+        randomize: true
+      });
+    }
+  }
+
   onPlay() {
     this.setState({
       gameStarted: true,
       gameEnded: false,
     });
     this.generateMatrix({
+      rows: this.rows,
+      columns: this.props.columns,
       animate: true,
       animationWait: 10,
       randomize: true
@@ -84,6 +123,8 @@ class NetwalkGame extends Component {
   generateMatrix(options) {
 
     options = _.extend({
+      rows: 3,
+      columns: 5,
       animate: true,
       animationWait: 100,
       randomize: true
@@ -92,7 +133,7 @@ class NetwalkGame extends Component {
     this.Netwalk = new Netwalk;
 
     if (options.animate) {
-      this.Netwalk.generateMatrixAsync(this.props.rows, this.props.columns, (function(matrix) {
+      this.Netwalk.generateMatrixAsync(options.rows, options.columns, (function(matrix) {
         this.setState(_.extend(this.state, {
           matrix: matrix
         }));
@@ -107,7 +148,7 @@ class NetwalkGame extends Component {
 
     } else {
 
-      let matrix = this.Netwalk.generateMatrix(this.props.rows, this.props.columns);
+      let matrix = this.Netwalk.generateMatrix(options.rows, options.columns);
       if (options.randomize) {
         matrix = this.Netwalk.randomizeMatrix(matrix);
       }
