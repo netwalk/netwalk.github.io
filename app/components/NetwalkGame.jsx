@@ -2,6 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import NetwalkUI from './NetwalkUI';
 import Netwalk from './Netwalk';
 import PlayButton from './PlayButton';
+import LevelUp from './LevelUp';
+import LevelDown from './LevelDown';
 import _ from 'underscore';
 import Radium from 'radium';
 
@@ -39,7 +41,8 @@ class NetwalkGame extends Component {
   render() {
     let Play,
         Replay,
-        LevelUp;
+        IncreaseDifficulty,
+        DecreaseDifficulty;
 
     // Only show "Start Game" button if game has not yet started
     if (!this.state.gameStarted && !this.state.gameEnded) {
@@ -51,22 +54,22 @@ class NetwalkGame extends Component {
     }
 
     if (this.state.gameStarted && !this.state.gameEnded) {
-      LevelUp = <div>
-        Too easy?
-        <button onClick={this.addRow.bind(this)}>Add row</button>
-        Too hard?
-        <button onClick={this.removeRow.bind(this)}>Remove row</button>
-        </div>;
+      IncreaseDifficulty = <LevelUp onTrigger={this.addRow.bind(this)} />
+
+      if (this.state.rows > 2) {
+        DecreaseDifficulty = <LevelDown onTrigger={this.removeRow.bind(this)} />
+      }
     }
 
     return (
       <div style={styles.base}>
-        {LevelUp}
+        {IncreaseDifficulty}
         <div style={[!this.state.gameStarted && styles.board]}>
           <NetwalkUI matrix={this.state.matrix} onRotate={this.rotateNode.bind(this)} />
         </div>
         {Play}
         {Replay}
+        {DecreaseDifficulty}
       </div>
     );
   }
