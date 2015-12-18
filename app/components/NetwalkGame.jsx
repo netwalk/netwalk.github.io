@@ -21,10 +21,9 @@ class NetwalkGame extends Component {
     this.state = {
       matrix: [],
       gameStarted: false,
-      gameEnded: false
+      gameEnded: false,
+      rows: this.props.rows
     };
-
-    this.rows = this.props.rows;
   }
 
   componentDidMount() {
@@ -85,9 +84,8 @@ class NetwalkGame extends Component {
   }
 
   addRow() {
-    this.rows++;
     this.generateMatrix({
-      rows: this.rows,
+      rows: this.state.rows + 1,
       columns: this.props.columns,
       animate: false,
       randomize: true
@@ -95,10 +93,9 @@ class NetwalkGame extends Component {
   }
 
   removeRow() {
-    if (this.rows > 2) {
-      this.rows--
+    if (this.state.rows > 2) {
       this.generateMatrix({
-        rows: this.rows,
+        rows: this.state.rows - 1,
         columns: this.props.columns,
         animate: false,
         randomize: true
@@ -112,7 +109,7 @@ class NetwalkGame extends Component {
       gameEnded: false,
     });
     this.generateMatrix({
-      rows: this.rows,
+      rows: this.state.rows,
       columns: this.props.columns,
       animate: true,
       animationWait: 10,
@@ -135,6 +132,7 @@ class NetwalkGame extends Component {
     if (options.animate) {
       this.Netwalk.generateMatrixAsync(options.rows, options.columns, (function(matrix) {
         this.setState(_.extend(this.state, {
+          rows: options.rows,
           matrix: matrix
         }));
         if (options.randomize && this.Netwalk.isMatrixReady(matrix)) {
@@ -153,6 +151,7 @@ class NetwalkGame extends Component {
         matrix = this.Netwalk.randomizeMatrix(matrix);
       }
       this.setState(_.extend(this.state, {
+        rows: options.rows,
         matrix: matrix
       }));
 
