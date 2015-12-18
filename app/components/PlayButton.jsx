@@ -46,9 +46,6 @@ const styles = {
     border: '2px solid #8EC170',
     fontFamily: '"Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif',
     fontSize: '18px',
-    '@media (min-width: 640px)': {
-      fontSize: '22px',
-    },
     fontWeight: '500',
     padding: '10px 10px',
     '@media (min-width: 640px)': {
