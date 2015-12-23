@@ -2,12 +2,10 @@ import './netwalk.scss';
 
 import React, { Component } from 'react';
 import Node from './Node';
+import pureRender from 'pure-render-decorator';
 
+@pureRender
 export default class NetwalkUI extends Component {
-
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     return <div className="NetwalkUI">{this.renderNodes()}</div>;

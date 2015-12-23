@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import pureRender from 'pure-render-decorator';
 import Radium from 'radium';
 
+@pureRender
 @Radium
 export default class LevelUp extends Component {
   render() {
@@ -17,10 +19,10 @@ export default class LevelUp extends Component {
 
 const styles = {
   base: {
-    textAlign: 'left',
-    paddingBottom: '15px',
+    textAlign: 'center',
+    padding: '15px 0',
     '@media (min-width: 640px)': {
-      paddingBottom: '25px'
+      padding: '25px 0'
     }
   },
   text: {
@@ -33,9 +35,9 @@ const styles = {
     fontWeight: '100',
   },
   button: {
-    color: '#6FBE6C',
     backgroundColor: '#fff',
-    border: '1px solid #6FBE6C',
+    border: '1px solid #7B7B7B',
+    color: '#7B7B7B',
     fontFamily: '"Courier New", "Courier", monospace',
     fontSize: '18px',
     '@media (min-width: 640px)': {
@@ -45,9 +47,9 @@ const styles = {
     marginLeft: '15px',
     padding: '2px 5px',
     ':hover': {
-      cursor: 'pointer',
-      border: '1px solid #B0DDAE',
-      color: '#B0DDAE'
+      border: '1px solid #B3B3B3',
+      color: '#B3B3B3',
+      cursor: 'pointer'
     },
     ':focus': {
       outline:0

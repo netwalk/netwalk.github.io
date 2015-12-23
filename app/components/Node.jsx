@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
+import pureRender from 'pure-render-decorator';
 
+@pureRender
 export default class Node extends Component {
-
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     return <div className={"NetwalkUI-node" + (this.props.connected ? '--connected' : '')}

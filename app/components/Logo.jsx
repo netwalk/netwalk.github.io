@@ -1,21 +1,13 @@
 import React, { Component } from 'react';
+import pureRender from 'pure-render-decorator';
 import Radium from 'radium';
+import CSSModules from 'react-css-modules';
+import styles from './Logo.css';
 
-@Radium
+@CSSModules(styles)
+@pureRender
 export default class Logo extends Component {
   render() {
-    return <h1 style={styles}>Netwalk</h1>
+    return <h1 styleName='Logo'>Netwalk</h1>
   }
-}
-
-const styles = {
-  color: '#8EC170',
-  fontFamily: '"Courier New", "Courier", monospace',
-  fontSize: '45px',
-  '@media (min-width: 640px)': {
-    fontSize: '75px',
-  },
-  fontWeight: '100',
-  margin: '1em 0 0',
-  textAlign: 'center'
 }

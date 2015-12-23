@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import pureRender from 'pure-render-decorator';
 import Radium from 'radium';
 
+@pureRender
 @Radium
 export default class App extends Component {
   render() {

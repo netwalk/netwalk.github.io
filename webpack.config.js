@@ -34,6 +34,10 @@ var common = {
       }
     ]
   },
+  postcss: [
+    require('autoprefixer')({ browsers: ['last 2 versions'] }),
+    require('postcss-color-rebeccapurple')
+  ],
   plugins: [
     new HtmlwebpackPlugin({
       title: 'Netwalk game',
@@ -49,12 +53,17 @@ if (TARGET === 'start' || !TARGET) {
       loaders: [
         {
           test: /\.scss$/,
-          loader: 'style!css!sass',
+          loader: 'style!css!postcss-loader!sass',
+          include: PATHS.app
+        },
+        {
+          test: /\.css$/,
+          loader: 'style!css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss',
           include: PATHS.app
         }
       ]
     },
-    devtool: 'eval-source-map',
+    devtool: 'source-map',
     plugins: [
       new webpack.DefinePlugin({
         __DEV__: true
@@ -77,7 +86,12 @@ if(TARGET === 'build' || TARGET === 'stats' || TARGET === 'deploy') {
       loaders: [
         {
           test: /\.scss$/,
-          loader: 'style!css!sass',
+          loader: ExtractTextPlugin.extract('style', 'css!postcss!sass'),
+          include: PATHS.app
+        },
+        {
+          test: /\.css$/,
+          loader: ExtractTextPlugin.extract('style', 'css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss'),
           include: PATHS.app
         }
       ]

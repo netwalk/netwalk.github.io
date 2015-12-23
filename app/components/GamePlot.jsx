@@ -1,11 +1,18 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import NetwalkGame from './NetwalkGame';
+import pureRender from 'pure-render-decorator';
 
-class GamePlot extends Component {
+@pureRender
+export default class GamePlot extends Component {
+  static propTypes = {
+    width: PropTypes.number,
+    height: PropTypes.number
+  }
 
-  constructor(props) {
-    super(props);
+  static defaultProps = {
+    width: 300,
+    height: 300
   }
 
   render() {
@@ -44,12 +51,4 @@ class GamePlot extends Component {
             animationWait={100}
             randomize={false} />;
   }
-
 }
-
-GamePlot.defaultProps = {
-  width: 300,
-  height: 300
-}
-
-export default GamePlot;

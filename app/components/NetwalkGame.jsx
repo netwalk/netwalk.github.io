@@ -4,6 +4,7 @@ import Netwalk from './Netwalk';
 import PlayButton from './PlayButton';
 import LevelUp from './LevelUp';
 import LevelDown from './LevelDown';
+import Mask from './Mask';
 import _ from 'underscore';
 import Radium from 'radium';
 
@@ -15,6 +16,14 @@ class NetwalkGame extends Component {
     animate: PropTypes.bool,
     animationWait: PropTypes.number,
     randomize: PropTypes.bool
+  }
+
+  static defaultProps = {
+    rows: 3,
+    columns: 5,
+    animate: true,
+    animationWait: 10,
+    randomize: true
   }
 
   constructor(props) {
@@ -41,6 +50,7 @@ class NetwalkGame extends Component {
   render() {
     let Play,
         Replay,
+        mask,
         IncreaseDifficulty,
         DecreaseDifficulty;
 
@@ -53,6 +63,13 @@ class NetwalkGame extends Component {
       Replay = <PlayButton onPlay={this.onPlay.bind(this)} title="Play again?" />;
     }
 
+    if (!this.state.gameStarted) {
+      mask = <Mask opacity={0.6} />
+    }
+    if (!this.state.gameStarted && this.state.gameEnded) {
+      mask = <Mask opacity={0.4} />
+    }
+
     if (this.state.gameStarted && !this.state.gameEnded) {
       IncreaseDifficulty = <LevelUp onTrigger={this.addRow.bind(this)} />
 
@@ -63,13 +80,16 @@ class NetwalkGame extends Component {
 
     return (
       <div style={styles.base}>
-        {IncreaseDifficulty}
-        <div style={[!this.state.gameStarted && styles.board]}>
+        <div style={styles.difficultyContainer}>
+          {IncreaseDifficulty}
+          {DecreaseDifficulty}
+        </div>
+        <div style={[!this.state.gameStarted && !this.state.gameEnded && styles.blur]}>
           <NetwalkUI matrix={this.state.matrix} onRotate={this.rotateNode.bind(this)} />
         </div>
+        {mask}
         {Play}
         {Replay}
-        {DecreaseDifficulty}
       </div>
     );
   }
@@ -163,19 +183,18 @@ class NetwalkGame extends Component {
 
 }
 
-NetwalkGame.defaultProps = {
-  rows: 3,
-  columns: 5,
-  animate: true,
-  animationWait: 10,
-  randomize: true
-}
-
 const styles = {
   base: {
     position: 'relative'
   },
-  board: {
+  difficultyContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    flexWrap: 'wrap',
+    alignItems: 'flex-start'
+  },
+  blur: {
     filter: 'blur(3px) grayscale(100%)',
     WebkitFilter: 'blur(3px) grayscale(100%)'
   }

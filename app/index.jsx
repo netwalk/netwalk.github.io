@@ -5,6 +5,7 @@ import { render } from 'react-dom';
 import App from './components/App';
 import Logo from './components/Logo';
 import Subtitle from './components/Subtitle';
+import Paragraph from './components/Paragraph';
 import GamePlot from './components/GamePlot';
 import HowToPlay from './components/HowToPlay';
 

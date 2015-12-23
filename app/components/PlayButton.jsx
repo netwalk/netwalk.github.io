@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
+import pureRender from 'pure-render-decorator';
 import Radium from 'radium';
 
+@pureRender
 @Radium
 export default class PlayButton extends Component {
   render() {
     return (
       <div>
-        <div style={styles.mask}>
-        </div>
         <div style={styles.base}>
           <button style={styles.button} onClick={this.props.onPlay}>
             {this.props.title}
@@ -19,16 +19,6 @@ export default class PlayButton extends Component {
 }
 
 const styles = {
-  mask: {
-    width: '100%',
-    height: '100%',
-    opacity: '0.8',
-    backgroundColor: '#fff',
-    position: 'absolute',
-    top: 0,
-    left: 0
-  },
-
   base: {
     width: '100%',
     height: '100%',

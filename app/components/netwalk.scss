@@ -1,10 +1,10 @@
+$link-color: #ccc;
+$computer-connected-screen-color: #0CCC29;
+$link-connected-color: #ADCF99;
+
 .NetwalkUI {
   display: flex;
   flex-direction: column;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
   user-select: none;
 }
 
@@ -56,7 +56,7 @@
     height: 60%;
     
     .NetwalkUI-node--connected & {
-      background-color: #0CCC29;
+      background-color: $computer-connected-screen-color;
     }
   }
 }
@@ -64,35 +64,35 @@
 .NetwalkUI-node-uplink {
   position: absolute;
   top: 0%; right: 40%; bottom: 40%; left: 40%;
-  background-color: #ADCF99;
+  background-color: $link-color;
   .NetwalkUI-node--connected & {
-    // background-color: #0CCC29;
+    background-color: $link-connected-color;
   }
 }
 
 .NetwalkUI-node-rightlink {
   position: absolute;
   top: 40%; right: 0%; bottom: 40%; left: 40%;
-  background-color: #ADCF99; 
+  background-color: $link-color; 
   .NetwalkUI-node--connected & {
-    // background-color: #0CCC29;
+    background-color: $link-connected-color;
   }
 }
 
 .NetwalkUI-node-downlink {
   position: absolute;
   top: 40%; right: 40%; bottom: 0%; left: 40%;
-  background-color: #ADCF99; 
+  background-color: $link-color; 
   .NetwalkUI-node--connected & {
-    // background-color: #0CCC29;
+    background-color: $link-connected-color;
   }
 }
 
 .NetwalkUI-node-leftlink {
   position: absolute;
   top: 40%; right: 40%; bottom: 40%; left: 0%;
-  background-color: #ADCF99; 
+  background-color: $link-color; 
   .NetwalkUI-node--connected & {
-    // background-color: #0CCC29;
+    background-color: $link-connected-color;
   }
 }
