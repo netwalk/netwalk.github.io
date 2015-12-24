@@ -55,11 +55,6 @@ if (TARGET === 'start' || !TARGET) {
           test: /\.scss$/,
           loader: 'style!css!postcss-loader!sass',
           include: PATHS.app
-        },
-        {
-          test: /\.css$/,
-          loader: 'style!css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss',
-          include: PATHS.app
         }
       ]
     },
@@ -87,11 +82,6 @@ if(TARGET === 'build' || TARGET === 'stats' || TARGET === 'deploy') {
         {
           test: /\.scss$/,
           loader: ExtractTextPlugin.extract('style', 'css!postcss!sass'),
-          include: PATHS.app
-        },
-        {
-          test: /\.css$/,
-          loader: ExtractTextPlugin.extract('style', 'css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss'),
           include: PATHS.app
         }
       ]

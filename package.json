@@ -52,7 +52,6 @@
     "pure-render-decorator": "^0.2.0",
     "radium": "^0.15.3",
     "react": "^0.14.3",
-    "react-css-modules": "^3.6.3",
     "react-dom": "^0.14.3",
     "underscore": "^1.8.3",
     "vektor": "^0.3.0"
