@@ -10,7 +10,9 @@
     "stats": "webpack --profile --json > stats.json",
     "start": "webpack-dev-server --hot --inline",
     "build": "webpack",
-    "deploy": "node ./lib/deploy.js"
+    "predeploy": "npm run build",
+    "deploy": "node ./lib/deploy.js",
+    "postdeploy": "git push origin source"
   },
   "repository": {
     "type": "git",
