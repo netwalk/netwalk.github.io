@@ -1,0 +1,7 @@
+language: ruby
+before_script:
+  - gem install percy-cli
+  - npm install
+script:
+  - npm run build
+  - percy snapshot build/
